@@ -1,0 +1,43 @@
+<x-app-layout>
+    <x-slot name="header">
+
+        <div class="flex justify-between">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                {{ __('Edit Permissions') }}
+            </h2>
+            <div>
+                <a href="{{ route('permissions.index') }}" class="px-4 py-2 bg-blue-500 text-white rounded-md">Back</a>
+            </div>
+        </div>
+
+        <!-- <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            {{ __('Create Permission') }}
+        </h2> -->
+    </x-slot>
+
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
+                    <form action="{{ route('permissions.update', $permission->id) }}" method="POST">
+                        @csrf
+                        <div>
+                            <label for="name" class="text-lg font-medium">Permission Name</label>
+                            <div class="my-4">
+                                <input type="text" value="{{ old('name',$permission->name) }}" placeholder="Enter Permission Name" name="name" id="name" class=" border-gray-500 rounded px-3 py-3 w-1/2">
+                                @error('name')
+                                <p class="text-red-500 font-medium">{{ $message }}</p>
+                                @enderror
+                            </div>
+
+
+                            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                                Submit
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</x-app-layout>
