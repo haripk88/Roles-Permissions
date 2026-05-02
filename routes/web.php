@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Api\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -59,6 +60,14 @@ Route::middleware('auth')->group(function () {
     Route::get('/articles/{id}/edit', [\App\Http\Controllers\Api\ArticleController::class, 'edit'])->name('articles.edit');
     Route::post('/articles/{id}/update', [\App\Http\Controllers\Api\ArticleController::class, 'update'])->name('articles.update');
     Route::delete('/articles', [\App\Http\Controllers\Api\ArticleController::class, 'destroy'])->name('articles.destroy');
+
+    //users routes
+    Route::get('/users', [\App\Http\Controllers\Api\UserController::class, 'index'])->name('users.index');
+    Route::get('/users/create', [\App\Http\Controllers\Api\UserController::class, 'create'])->name('users.create');
+    Route::post('/users/store', [\App\Http\Controllers\Api\UserController::class, 'store'])->name('users.store');
+    Route::get('/users/{id}/edit', [\App\Http\Controllers\Api\UserController::class, 'edit'])->name('users.edit');
+    Route::post('/users/{id}/update', [\App\Http\Controllers\Api\UserController::class, 'update'])->name('users.update');
+    Route::delete('/users', [\App\Http\Controllers\Api\UserController::class, 'destroy'])->name('users.destroy');
 });
 
 require __DIR__ . '/auth.php';
