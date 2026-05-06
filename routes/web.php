@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\PermissionController;
 use App\Http\Controllers\Api\RoleController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -68,6 +69,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/users/{id}/edit', [\App\Http\Controllers\Api\UserController::class, 'edit'])->name('users.edit');
     Route::post('/users/{id}/update', [\App\Http\Controllers\Api\UserController::class, 'update'])->name('users.update');
     Route::delete('/users', [\App\Http\Controllers\Api\UserController::class, 'destroy'])->name('users.destroy');
+
+    //payment routes
+    Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
+    Route::post('/create-order', [PaymentController::class, 'createOrder']);
+    Route::post('/verify-payment', [PaymentController::class, 'verify']);
 });
 
 require __DIR__ . '/auth.php';
