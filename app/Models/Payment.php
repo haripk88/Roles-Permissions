@@ -12,8 +12,14 @@ class Payment extends Model
     protected $fillable = [
         'user_id',
         'razorpay_order_id',
+        'razorpay_payment_id',
+        'razorpay_signature',
         'amount',
+        'currency',
         'status',
+        'remaining_balance',
+        'type',
+        'payment_method'
     ];
 
     public function user()

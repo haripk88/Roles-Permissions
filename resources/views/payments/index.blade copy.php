@@ -1,53 +1,16 @@
-<div id="paymentModal"
-    class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-
-    <div class="bg-white p-6 rounded-lg w-[500px]">
-
-        <h2 class="text-xl font-bold mb-4">
-            Add Wallet Balance
-        </h2>
-
-        <input
-            type="number"
-            id="paymentAmount"
-            placeholder="Enter Amount"
-            class="w-full border rounded px-3 py-2 mb-4">
-
-        <div class="flex justify-end gap-2">
-
-            <button onclick="closePaymentModal()"
-                class="px-4 py-2 bg-gray-400 text-white rounded">
-                Cancel
-            </button>
-
-            <button onclick="payNow()"
-                class="px-4 py-2 bg-blue-500 text-white rounded">
-                Continue
-            </button>
-
-        </div>
-
-    </div>
-</div>
-
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between">
             <h2 class="font-semibold text-xl text-gray-800 leading-tight">
                 {{ __('Payments') }}
             </h2>
-            <div class="mb-4 text-lg font-bold text-green-600">
-                Wallet Balance:
-                ₹{{ auth()->user()->wallet_balance }}
-            </div>
             <div>
-                <button class="px-4 py-2 bg-blue-500  hover:bg-blue-700 text-white rounded-md" onclick="openPaymentModal()">Pay Now</button>
+                <button class="px-4 py-2 bg-blue-500  hover:bg-blue-700 text-white rounded-md" onclick="payNow()">Pay Now</button>
 
             </div>
 
         </div>
     </x-slot>
-
 
 
     <div class="py-12">
@@ -59,7 +22,6 @@
                         <th class="px-6 py-3 text-left">#</th>
                         <th class="px-6 py-3 text-left">User</th>
                         <th class="px-6 py-3 text-left">Amount</th>
-                        <th class="px-6 py-3 text-left">Remaining Balance</th>
                         <th class="px-6 py-3 text-left">Currency</th>
                         <th class="px-6 py-3 text-center">Status</th>
                     </tr>
@@ -71,7 +33,6 @@
                         <td class="px-6 py-4 text-left">{{ $payment->id }}</td>
                         <td class="px-6 py-4 text-left">{{ $payment->user->name }}</td>
                         <td class="px-6 py-4 text-left">{{ $payment->amount }}</td>
-                        <td class="px-6 py-4 text-left">{{ $payment->remaining_balance }}</td>
                         <td class="px-6 py-4 text-left">{{ $payment->currency }}</td>
                         <td class="px-6 py-4 text-center">
                             {{ $payment->status }}
@@ -89,28 +50,8 @@
     </div>
     <x-slot name="script">
         <script>
-            function openPaymentModal() {
-                document.getElementById('paymentModal')
-                    .classList.remove('hidden');
-            }
-
-            function closePaymentModal() {
-                document.getElementById('paymentModal')
-                    .classList.add('hidden');
-            }
-
             async function payNow() {
-                let amount = document.getElementById('paymentAmount').value;
-
-                if (!amount || amount <= 0) {
-                    alert('Please enter valid amount');
-                    return;
-                }
-
-                let token = document
-                    .querySelector('meta[name="csrf-token"]')
-                    .getAttribute('content');
-
+                let token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
                 let response = await fetch('/create-order', {
                     method: 'POST',
                     headers: {
@@ -118,56 +59,58 @@
                         'X-CSRF-TOKEN': token
                     },
                     body: JSON.stringify({
-                        amount: amount
+                        amount: 500
                     })
                 });
 
                 let data = await response.json();
-
+                console.log(data);
                 var options = {
-
                     key: "{{ config('razorpay.key') }}",
-
                     amount: data.amount,
-
                     currency: "INR",
-
                     order_id: data.order_id,
 
-                    handler: async function(response) {
-                        let verify = await fetch('/verify-payment', {
-
+                    handler: function(response) {
+                        fetch('/verify-payment', {
                             method: 'POST',
-
                             headers: {
                                 'Content-Type': 'application/json',
                                 'X-CSRF-TOKEN': token
                             },
-
                             body: JSON.stringify(response)
                         });
-
-                        let verifyData = await verify.json();
-
-                        if (verifyData.success) {
-
-                            alert('Payment Successful');
-
-                            window.location.reload();
-
-                        } else {
-
-                            alert('Payment Failed');
-                        }
                     }
                 };
 
                 var rzp = new Razorpay(options);
-
                 rzp.open();
-
-                closePaymentModal();
             }
         </script>
+        <!-- <script>
+            $(document).on('click', '.delete-btn', function() {
+                let id = $(this).data('id');
+
+                if (confirm('Are you sure you want to delete this payment?')) {
+                    $.ajax({
+                        url: '/payments/',
+                        type: 'DELETE',
+                        dataType: 'json',
+                        data: {
+                            'id': id
+                        },
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        success: function(response) {
+                            window.location.reload();
+                        },
+                        error: function(xhr) {
+                            console.log(xhr.responseText);
+                        }
+                    });
+                }
+            });
+        </script> -->
     </x-slot>
 </x-app-layout>

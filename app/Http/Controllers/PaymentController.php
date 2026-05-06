@@ -10,7 +10,9 @@ class PaymentController extends Controller
 {
     public function index()
     {
-        $payments = Payment::where('user_id', auth()->id())->get();
+        $payments = Payment::where('user_id', auth()->id())
+            ->latest()
+            ->get();
         return view('payments.index', [
             'payments' => $payments
         ]);
@@ -19,13 +21,18 @@ class PaymentController extends Controller
     public function createOrder(Request $request, RazorpayService $razorpay)
     {
 
+        $request->validate([
+            'amount' => 'required|numeric|min:1'
+        ]);
+
         $order = $razorpay->createOrder($request->amount);
 
-        $payment = Payment::create([
+        Payment::create([
             'user_id' => auth()->id(),
             'razorpay_order_id' => $order['id'],
             'amount' => $request->amount,
-            'status' => 'created'
+            'currency' => 'INR',
+            'status' => 'created',
         ]);
 
         return response()->json([
@@ -37,23 +44,48 @@ class PaymentController extends Controller
     public function verify(Request $request, RazorpayService $razorpay)
     {
         try {
+
             $razorpay->verifySignature([
                 'razorpay_order_id' => $request->razorpay_order_id,
                 'razorpay_payment_id' => $request->razorpay_payment_id,
                 'razorpay_signature' => $request->razorpay_signature,
             ]);
 
-            $payment = Payment::where('razorpay_order_id', $request->razorpay_order_id)->first();
+            $payment = Payment::where(
+                'razorpay_order_id',
+                $request->razorpay_order_id
+            )->first();
 
+            if (!$payment || $payment->status == 'paid') {
+                return response()->json([
+                    'success' => false
+                ]);
+            }
+
+            $user = auth()->user();
+
+            // Add balance
+            $user->wallet_balance += $payment->amount;
+            $user->save();
+
+            // Update payment
             $payment->update([
                 'razorpay_payment_id' => $request->razorpay_payment_id,
                 'razorpay_signature' => $request->razorpay_signature,
-                'status' => 'paid'
+                'status' => 'paid',
+                'payment_method' => 'razorpay',
+                'remaining_balance' => $user->wallet_balance
             ]);
 
-            return response()->json(['success' => true]);
+            return response()->json([
+                'success' => true
+            ]);
         } catch (\Exception $e) {
-            return response()->json(['error' => 'Payment failed']);
+
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage()
+            ]);
         }
     }
 }
