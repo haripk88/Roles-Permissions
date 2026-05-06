@@ -73,6 +73,7 @@ Route::middleware('auth')->group(function () {
     //payment routes
     Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
     Route::post('/create-order', [PaymentController::class, 'createOrder']);
+    Route::post('/purchase-order', [PaymentController::class, 'purchase']);
     Route::post('/verify-payment', [PaymentController::class, 'verify']);
 });
 

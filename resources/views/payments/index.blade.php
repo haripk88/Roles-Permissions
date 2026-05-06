@@ -30,6 +30,38 @@
     </div>
 </div>
 
+<div id="purchaseModal"
+    class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+
+    <div class="bg-white p-6 rounded-lg w-[500px]">
+
+        <h2 class="text-xl font-bold mb-4">
+            Purchase Item
+        </h2>
+
+        <input
+            type="number"
+            id="purchaseAmount"
+            placeholder="Enter Amount"
+            class="w-full border rounded px-3 py-2 mb-4">
+
+        <div class="flex justify-end gap-2">
+
+            <button onclick="closePurchaseModal()"
+                class="px-4 py-2 bg-gray-400 text-white rounded">
+                Cancel
+            </button>
+
+            <button onclick="purchaseNow()"
+                class="px-4 py-2 bg-blue-500 text-white rounded">
+                Purchase
+            </button>
+
+        </div>
+
+    </div>
+</div>
+
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between">
@@ -42,6 +74,7 @@
             </div>
             <div>
                 <button class="px-4 py-2 bg-blue-500  hover:bg-blue-700 text-white rounded-md" onclick="openPaymentModal()">Pay Now</button>
+                <button class="px-4 py-2 bg-blue-500  hover:bg-blue-700 text-white rounded-md" onclick="openPurchaseModal()">Purchase</button>
 
             </div>
 
@@ -59,7 +92,7 @@
                         <th class="px-6 py-3 text-left">#</th>
                         <th class="px-6 py-3 text-left">User</th>
                         <th class="px-6 py-3 text-left">Amount</th>
-                        <th class="px-6 py-3 text-left">Remaining Balance</th>
+                        <th class="px-6 py-3 text-left">Payment Type</th>
                         <th class="px-6 py-3 text-left">Currency</th>
                         <th class="px-6 py-3 text-center">Status</th>
                     </tr>
@@ -71,7 +104,7 @@
                         <td class="px-6 py-4 text-left">{{ $payment->id }}</td>
                         <td class="px-6 py-4 text-left">{{ $payment->user->name }}</td>
                         <td class="px-6 py-4 text-left">{{ $payment->amount }}</td>
-                        <td class="px-6 py-4 text-left">{{ $payment->remaining_balance }}</td>
+                        <td class="px-6 py-4 text-left">{{ $payment->type }}</td>
                         <td class="px-6 py-4 text-left">{{ $payment->currency }}</td>
                         <td class="px-6 py-4 text-center">
                             {{ $payment->status }}
@@ -89,6 +122,43 @@
     </div>
     <x-slot name="script">
         <script>
+            function openPurchaseModal() {
+                document.getElementById('purchaseModal').classList.remove('hidden');
+            }
+
+            function closePurchaseModal() {
+                document.getElementById('purchaseModal').classList.add('hidden');
+            }
+
+            function purchaseNow() {
+                let amount = document.getElementById('purchaseAmount').value;
+
+                if (!amount || amount <= 0) {
+                    alert('Please enter a valid amount');
+                    return;
+                }
+
+                let token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
+                fetch('/purchase-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': token
+                    },
+                    body: JSON.stringify({
+                        amount: amount
+                    }),
+                }).then(res => res.json()).then(data => {
+                    if (data.success) {
+                        alert('Purchase Successful');
+                        window.location.reload();
+                    } else {
+                        alert('Purchase Failed');
+                    }
+                })
+            }
+
             function openPaymentModal() {
                 document.getElementById('paymentModal')
                     .classList.remove('hidden');

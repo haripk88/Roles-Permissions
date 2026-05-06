@@ -13,10 +13,10 @@ class ArticleController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('permission:article view')->only(['index', 'show']);
-        $this->middleware('permission:article create')->only(['create', 'store']);
-        $this->middleware('permission:article edit')->only(['edit', 'update']);
-        $this->middleware('permission:article delete')->only(['destroy']);
+        $this->middleware('permission:articles_view')->only(['index', 'show']);
+        $this->middleware('permission:articles_create')->only(['create', 'store']);
+        $this->middleware('permission:articles_update')->only(['edit', 'update']);
+        $this->middleware('permission:articles_delete')->only(['destroy']);
     }
 
 

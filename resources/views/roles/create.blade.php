@@ -36,7 +36,7 @@
                                 @foreach($permissions as $permission)
                                 <div class="mt-3">
                                     <input type="checkbox" name="permissions[]" value="{{ $permission->name }}" id="permission_{{ $permission->name }}" class="mr-2">
-                                    <label for="permission_{{ $permission->name }}" class="text-gray-700">{{ $permission->name }}</label>
+                                    <label for="permission_{{ $permission->name }}" class="text-gray-700">{{ $permission->display_name }}</label>
                                 </div>
                                 @endforeach
                                 @else

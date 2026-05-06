@@ -8,6 +8,11 @@ use App\Models\Payment;
 
 class PaymentController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('permission:payments_view')->only(['index', 'show']);
+        $this->middleware('permission:payments_create')->only(['create', 'store']);
+    }
     public function index()
     {
         $payments = Payment::where('user_id', auth()->id())
@@ -87,5 +92,41 @@ class PaymentController extends Controller
                 'message' => $e->getMessage()
             ]);
         }
+    }
+
+    public function purchase(Request $request)
+    {
+        $request->validate([
+            'amount' => 'required|numeric|min:1'
+        ]);
+
+        $user = auth()->user();
+
+        if ($user->wallet_balance < $request->amount) {
+            return response()->json([
+                'success' => false,
+                'message' => 'You have insufficient balance'
+            ]);
+        }
+
+        // Deduct balance
+        $user->wallet_balance -= $request->amount;
+        $user->save();
+
+        // Create payment record
+        Payment::create([
+            'user_id' => auth()->id(),
+            'amount' => $request->amount,
+            'currency' => 'INR',
+            'status' => 'paid',
+            'payment_method' => 'wallet',
+            'type' => 'debit',
+            'remaining_balance' => $user->wallet_balance
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Purchase successful'
+        ]);
     }
 }

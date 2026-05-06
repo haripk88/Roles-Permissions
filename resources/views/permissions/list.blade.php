@@ -29,10 +29,10 @@
                     @foreach($permissions as $permission)
                     <tr class="border-b">
                         <td class="px-6 py-4 text-left">{{ $permission->id }}</td>
-                        <td class="px-6 py-4 text-left">{{ $permission->name }}</td>
+                        <td class="px-6 py-4 text-left">{{ $permission->display_name }}</td>
                         <td class="px-6 py-4 text-left">{{ \Carbon\Carbon::parse($permission->created_at)->format('d M, Y') }}</td>
                         <td class="px-6 py-4 text-center">
-                            <a href="{{route('permissions.edit', $permission->id)}}" class="px-4 py-2 bg-blue-500 hover:bg-blue-700 text-white rounded-md">Edit</a>
+                            <!-- <a href="{{route('permissions.edit', $permission->id)}}" class="px-4 py-2 bg-blue-500 hover:bg-blue-700 text-white rounded-md">Edit</a> -->
                             <!-- <a href="javascript:void(0)" class="px-4 py-2 bg-red-500 hover:bg-red-700 text-white rounded-md" onclick="deletePermission({{ $permission->id }})">Delete</a> -->
                             <button
                                 class="px-4 py-2 bg-red-500 hover:bg-red-700 text-white rounded-md delete-btn"
