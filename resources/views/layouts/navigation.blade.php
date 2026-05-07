@@ -33,7 +33,7 @@
                     </x-nav-link>
                 </div>
                 @endcan
-                @can('permission_view')
+                @can('permissions_view')
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                     <x-nav-link :href="route('permissions.index')" :active="request()->routeIs('permissions.index')">
                         {{ __('Permissions') }}
@@ -54,13 +54,13 @@
                     </x-nav-link>
                 </div>
                 @endcan
-
+                @can('permissions_view')
                 <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
                     <x-nav-link :href="route('payments.index')" :active="request()->routeIs('payments.index')">
                         {{ __('Payments') }}
                     </x-nav-link>
                 </div>
-
+                @endcan
             </div>
 
             <!-- Settings Dropdown -->
